@@ -6,7 +6,7 @@ type Props = {
 }
 
 const CommentItem: React.FC<Props> = ({comment}) => {
-    console.log('commentItem', comment)
+    //console.log('commentItem', comment)
     const {id, text, time, type} = comment;
 
     return (

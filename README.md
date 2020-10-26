@@ -44,3 +44,39 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## ToDo the Tech Assesment for WorkJam.
+
+
+This is the test we need the Web Devs to do in ReactJS:
+
+
+1.       Develop a web application in ReactJS that is consuming HackerNews REST API to:
+
+a.       Display the top 10 stories; and
+
+b.       Display 20 comments of those stories; and
+
+c.       Is responsive design
+
+ 
+
+Note: Please keep in mind the following two main factors:
+
+A.           Performance
+
+B.          Efficiency
+
+ 
+
+2.       Please provide your test in a pubic repository
+
+3.       Bonus point, include Unit Tests
+
+ 
+
+Documentation:
+
+HackerNews REST API: https://github.com/HackerNews/API
+
+ 
