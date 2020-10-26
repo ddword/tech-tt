@@ -1,38 +1,14 @@
 import React, { useState, useEffect } from "react";
+import ApiService from './components/services/ApiService';
 import ListOfStories from './components/ListOfStories';
 import StoryItem from './components/StoryItem';
 import {IStory} from './components/interfaces/story';
-import {IComment} from './components/interfaces/comment';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import './App.css';
 
-// actions from https://github.com/HackerNews/API
-const axios = require('axios').default;
-const endpoint = 'https://hacker-news.firebaseio.com/v0/';
-
-async function getListOfStories() {
-  return await axios({
-    method: 'get',
-    url: `${endpoint}topstories.json` + `?print=pretty`,
-  })
-}
-
-async function getStory(id:number){
-  return await axios({
-    method: 'get',
-    url: `${endpoint}item/` + id + `.json?print=pretty`,
-  })
-}  
-
-async function getComment(id:number){
-  return await axios({
-    method: 'get',
-    url: `${endpoint}item/` + id + `.json?print=pretty`,
-  })
-}
 // styles
 const drawerWidth = 240;
 
@@ -60,10 +36,10 @@ function App() {
   //state
   const[stories, setStories] = useState<number[]>([])
   const[story, setOneStory] = useState<Partial<IStory>>({});
-  const[comment, setOneComment] = useState<Partial<IComment>>({});
+  //const[comment, setOneComment] = useState<Partial<IComment>>({});
 
   useEffect(() => {
-    getListOfStories().then((res:any) => {
+    ApiService.getListOfStories().then((res:any) => {
       let data = res.status == 200 ? res.data : [];
       // get first 10 top stories 
       setStories(data.splice(0, 10))
@@ -78,7 +54,7 @@ function App() {
       return false;
     }
     //Promise<T| Error>
-    getStory(id).then((res:any) => {
+    ApiService.getStory(id).then((res:any) => {
       const data = res.status == 200 ? res.data : [];
       //remove tags from text
       if (data.text) {
@@ -86,7 +62,8 @@ function App() {
       }
       setOneStory(data);
       if (story?.id !== id) {
-        setOneComment({})
+        //setOneComment({})
+        //Todo find the way to reset comment & comments
       }
     })
     .catch((error:Promise<Error>) => {
@@ -94,24 +71,6 @@ function App() {
     }) 
   }
 
-  function handleComment(id:number) {
-    if (comment?.id === id) {
-      return false;
-    }
-    getComment(id).then((res:any) => {
-      const data = res.status == 200 ? res.data : [];
-      //remove tags from text
-      if (data.text) {
-        data.text = data.text.replace( /(<([^>]+)>)/ig, '');
-      }
-      setOneComment(data);
-    })
-    .catch((error:Promise<Error>) => {
-      console.error('Error in getComment' + error);
-    }) 
-  }
-
- console.log('Comment', comment)
  const classes = useStyles();
   return (
     <div className="App">
@@ -125,7 +84,7 @@ function App() {
           <ListOfStories stories={stories} selectStory = {handleStory}/>
           <main className={classes.content}>
             <div className={classes.toolbar} />
-              {story&& <StoryItem story={story} selectComment = {handleComment} commentContent={comment}/>}
+              {story&& <StoryItem story={story}/>}
           </main>  
       </div>
     </div>  

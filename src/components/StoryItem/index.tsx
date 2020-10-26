@@ -11,12 +11,12 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {IStory} from '../interfaces/story';
 import {IComment} from '../interfaces/comment';
 
+import ApiService from '../services/ApiService';
+
 type Props = {
-    story: Partial<IStory>,
-    commentContent: Partial<IComment>,
-    selectComment(id:number): void
+    story: Partial<IStory>
 }
-const storyHeight = 400;
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -26,29 +26,53 @@ const useStyles = makeStyles((theme: Theme) =>
         maxHeight:'40%'
     },
     commentsList:{
-        //height: `calc(100% - ${storyHeight}px)`,
         maxHeight: '60%',
         overflowY: 'scroll',
         position: 'absolute',
         width: `calc(100% - 300px)`,
-        // marginLeft: storyHeight,
     }
   })
 ); 
 
-const StoryItem: React.FC<Props> = ({story, commentContent, selectComment}) => {
-    console.log('storyItem', story)
-    const{id, kids, score, text, title, time, type, url} = story;
+const StoryItem: React.FC<Props> = ({story}) => {
+    console.log('Story', story)
+
+    const {id, kids, score, text, title, time, type, url} = story;
+    const [commentContent, setOneComment] = useState<Partial<IComment>>({});
+
+    const [expanded, setExpanded] = useState<number | boolean>(false);
+
+    
     //get first 20 comments
     let comments = kids?.slice(0,20);
 
-    const onSelect = (comment: number) =>{
-        console.log('comment select', comment)
-        selectComment(comment)
+    const onSelect = (comment: number) =>(event: React.ChangeEvent<{}>, isExpanded: boolean) => {
+        event.stopPropagation();
+        event.preventDefault();  
+        setExpanded(isExpanded ? comment : false); 
+        console.log('!!Comment select', comment)
+        handleSelectComment(comment)
+    }
+
+    function handleSelectComment(id:number) {
+        if (commentContent?.id === id) {
+          return false;
+        }
+
+        ApiService.getComment(id).then((res:any) => {
+          const data = res.status == 200 ? res.data : [];
+          //remove tags from text
+          if (data.text) {
+            data.text = data.text.replace( /(<([^>]+)>)/ig, '');
+          }
+          setOneComment(data);
+        })
+        .catch((error:Promise<Error>) => {
+          console.error('Error in getComment' + error);
+        }) 
     }
 
     const classes = useStyles();
-
     return (
         <div className={classes.root}>  
             { type === 'story'?
@@ -64,21 +88,22 @@ const StoryItem: React.FC<Props> = ({story, commentContent, selectComment}) => {
                 <h4 style={{padding:"0 15px"}}>Comments:</h4>    
                 <div className={classes.commentsList}>  
                     {comments&& comments.map((comment,id) =>
-                        <Accordion key={id}>
+                        <Accordion key={id}
+                            expanded={expanded === comment}
+                            onChange={onSelect(comment)}>
                             <AccordionSummary
                             expandIcon={<ExpandMoreIcon />}
-                            aria-controls="comment-content"
-                            id="comment-header"
-                            onClick={() => onSelect(comment)}>
+                            aria-controls={comment.toString() + '-content'}
+                            id={comment.toString() + '-header'}>
                                 <a>{comment}</a>
                             </AccordionSummary>
                             <AccordionDetails>
-                                {commentContent && <CommentItem comment={commentContent}/>}
+                                {commentContent ? <CommentItem comment={commentContent}/> : null}
                             </AccordionDetails> 
                         </Accordion>    
                     )} 
                 </div>  
-                </div>
+            </div>
             :  <h4 style={{padding:"0 15px"}}>The story Item</h4>        
             }
         </div>
