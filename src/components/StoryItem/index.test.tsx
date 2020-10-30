@@ -17,13 +17,15 @@ const mockStory:Partial<IStory> = {
     type: 'story',
     url : "http://www.getdropbox.com/u/2/screencast.html"
 }
-describe('tests in StoryItem', () =>{
+
+describe('tests in StoryItem', () => {
     test('renders test react import of StoryItem', () => {
         const wrapper = shallow(<StoryItem story={mockStory}/>);
         expect(wrapper.exists()).toBeTruthy();
         expect(CommentItem).toBeDefined();
         expect(ApiService).toBeDefined();
-        
-        //expect(link).toBeInTheDocument();
+    });
+    test('story state', () => {
+        const wrapper = shallow(<StoryItem story={mockStory}/>);
     });
 });    
