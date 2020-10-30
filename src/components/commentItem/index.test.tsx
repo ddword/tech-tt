@@ -1,11 +1,11 @@
 import React from "react";
-import { render, screen } from '@testing-library/react';
+import { shallow, mount } from "enzyme";
 import {IComment} from '../interfaces/comment';
 import CommentItem from './';
 
-type Props = {
+/*type Props = {
     comment: Partial<IComment>
-}
+}*/
 const mockComment: Partial<IComment> = {
     id: 18701,
     parent: 101,
@@ -15,7 +15,7 @@ const mockComment: Partial<IComment> = {
 }
 
 test('renders test react import of CommentItem', () => {
-    render(<CommentItem comment={mockComment}/>);
-    
+    const wrapper = shallow(<CommentItem comment={mockComment}/>);
+    expect(wrapper).toMatchSnapshot();
     //expect(link).toBeInTheDocument();
-  });
+});

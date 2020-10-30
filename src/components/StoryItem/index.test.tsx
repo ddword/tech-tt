@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from '@testing-library/react';
+import { shallow, mount } from "enzyme";
 import CommentItem from '../commentItem';
 import StoryItem from './';
 import {IStory} from '../interfaces/story';
@@ -17,11 +17,13 @@ const mockStory:Partial<IStory> = {
     type: 'story',
     url : "http://www.getdropbox.com/u/2/screencast.html"
 }
-
-test('renders test react import of StoryItem', () => {
-    render(<StoryItem story={mockStory}/>);
-    expect(CommentItem).toBeDefined();
-    expect(ApiService).toBeDefined();
-    
-    //expect(link).toBeInTheDocument();
-  });
+describe('tests in StoryItem', () =>{
+    test('renders test react import of StoryItem', () => {
+        const wrapper = shallow(<StoryItem story={mockStory}/>);
+        expect(wrapper.exists()).toBeTruthy();
+        expect(CommentItem).toBeDefined();
+        expect(ApiService).toBeDefined();
+        
+        //expect(link).toBeInTheDocument();
+    });
+});    
