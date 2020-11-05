@@ -8,6 +8,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import './App.css';
+import { AxiosError, AxiosPromise } from "axios";
 
 // styles
 const drawerWidth = 240;
@@ -32,29 +33,47 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-function App() {
+interface IResponse {
+  data: any,
+  status?: number,
+  error?: any
+}
+
+function useStoriesAPI() {
   //state
   const[stories, setStories] = useState<number[]>([])
-  const[story, setOneStory] = useState<Partial<IStory>>({});
-  //const[comment, setOneComment] = useState<Partial<IComment>>({});
 
-  useEffect(() => {
-    ApiService.getListOfStories().then((res:any) => {
+  React.useEffect(() => {
+    let didCancel = false;
+    ApiService.getListOfStories().then((res:Partial<IResponse>) => {
       let data = res.status == 200 ? res.data : [];
       // get first 10 top stories 
-      setStories(data.splice(0, 10))
+      if (!didCancel && data)
+        setStories(data.splice(0, 10))
     })
     .catch((error:Promise<Error>) => {
       console.error('Error in getListOfStories' + error);
     })
+    return () => {
+      didCancel = true;
+    };
   }, [])
+
+  return [stories];
+}
+
+const App = () => {
+  //state
+  const[stories] = useStoriesAPI()
+  const[story, setOneStory] = useState<Partial<IStory>>({});
+  //const[comment, setOneComment] = useState<Partial<IComment>>({});
 
   function handleStory(id:number) {
     if (story?.id === id) {
       return false;
     }
     //Promise<T| Error>
-    ApiService.getStory(id).then((res:any) => {
+    ApiService.getStory(id).then((res:Partial<IResponse>) => {
       const data = res.status == 200 ? res.data : [];
       //remove tags from text
       if (data.text) {
